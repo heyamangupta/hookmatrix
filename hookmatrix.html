@@ -108,9 +108,9 @@ footer{padding:30px 0 60px;color:var(--mut);font-size:13px}
 
 <section id="teardown"><div class="w"><h2>Competitor teardown.</h2><p class="mut">Paste a competitor’s page text or public ad copy. HookMatrix maps the angles it sees and suggests angles worth testing. It only knows what you paste, and it does not fetch pages.</p>
 <div class="card" style="margin-top:14px"><textarea id="cx" rows="5" placeholder="Paste competitor page text or public ad copy" aria-label="Competitor copy"></textarea><input id="cy" placeholder="Your offer in one line (optional)" aria-label="Your offer"><button class="btn" id="ct">Analyze angles</button><div class="err" id="ce" role="alert"></div><div id="co"></div></div></div></section>
-<section id="demo" style="background:var(--soft)"><div class="w"><h2>Try a sample matrix.</h2><p class="mut" style="margin-bottom:12px">Paste a product description or ad script and generate a matrix.</p><div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap"><span class="tag" id="mode" style="background:#B26A00">Checking…</span><span class="mut" style="font-size:13px" id="modeTxt"></span></div>
+<section id="demo" style="background:var(--soft)"><div class="w"><h2>Try a sample matrix.</h2><p class="mut" style="margin-bottom:12px">Paste a product description or ad script and generate a matrix.</p><div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap"><span class="tag" id="mode" style="background:#1F7A4D">Live: Ready</span><span class="mut" style="font-size:13px" id="modeTxt">Paste a product URL or copy to generate real hooks via AI.</span></div>
 <div class="dash"><div class="rail"><button class="on" id="rg1" data-t="g">Generate</button><button data-t="h">History</button><button id="rh" data-t="e">Exports</button><button data-t="s">Settings</button><h4>This session</h4><div id="hist" style="width:100%;font-size:13px;color:var(--mut)">No runs yet</div></div>
-<div class="main"><div class="form2"><textarea id="in" rows="3" placeholder="Paste a product description or ad script" aria-label="Product description or script"></textarea><input id="url" placeholder="Product URL (reference only, not fetched)" aria-label="Product URL"><input id="bv" placeholder="Brand voice (optional)" aria-label="Brand voice"><input id="nv" placeholder="Never say (comma-separated)" aria-label="Never say list"><select id="ind" aria-label="Industry"><option>E-com</option><option>SaaS</option><option>Coaching</option><option>Local</option></select><button class="btn" id="go">Generate Hook Matrix</button></div>
+<div class="main"><div class="form2"><textarea id="in" rows="3" placeholder="Paste a product description or ad script" aria-label="Product description or script"></textarea><input id="url" placeholder="Product URL (e.g. https://yourbrand.com/product)" aria-label="Product URL"><input id="bv" placeholder="Brand voice (optional)" aria-label="Brand voice"><input id="nv" placeholder="Never say (comma-separated)" aria-label="Never say list"><select id="ind" aria-label="Industry"><option>E-com</option><option>SaaS</option><option>Coaching</option><option>Local</option></select><button class="btn" id="go">Generate Hook Matrix</button></div>
 <div class="err" id="er" role="alert"></div><div id="out"><div class="empty">No matrix yet. Add a URL or script and press Generate.</div></div></div></div></div></section>
 
 <section id="pricing"><div class="w"><h2>Pricing.</h2><p class="mut" style="margin-bottom:16px">Proposed beta offer, not yet confirmed: first 25 users lock in $29/mo. No checkout is connected yet, and Agency seat count and fair-use limits are to be confirmed before billing.</p><div class="price">
@@ -121,7 +121,7 @@ footer{padding:30px 0 60px;color:var(--mut);font-size:13px}
 <details><summary>Will it guarantee better results?</summary><p>No. It gives you more distinct angles to test. Nobody can reliably predict which hook wins, so the point is testing five, not betting on one.</p></details>
 <details><summary>Does the policy flag guarantee approval?</summary><p>No. It marks claims worth a second look before you launch. Platform policies change, and enforcement is theirs.</p></details>
 <details><summary>What do I get out?</summary><p>For each hook: text, camera framing, B-roll cue, overlay text and a risk flag. Export as CSV.</p></details>
-<details><summary>How are URLs and product photos handled?</summary><p>URL fetching is not connected yet, so you paste page text or a script. Product photos and static ad creatives are planned, not live.</p></details><details><summary>What is live today?</summary><p>Where this page can reach Claude: three-pass generation, per-hook rewrites, competitor angle analysis from pasted text, and CSV export. Elsewhere it shows labeled sample output. There are no accounts, payments or email capture yet.</p></details></div></section>
+<details><summary>How are URLs handled?</summary><p>URLs are read automatically via Jina to parse the product offer and structure hooks.</p></details></div></section>
 
 <div class="w"><div class="cta"><h2>Stop reshooting the same hook.</h2><p style="opacity:.75;margin:10px 0 20px">Test five angles per offer.</p><a class="btn" href="#demo">Generate a sample matrix</a></div></div>
 <footer><div class="w">HookMatrix prototype. Sample content is illustrative. Not a guarantee of ad performance or ad approval.</div></footer>
@@ -137,104 +137,140 @@ const H=[[["Don’t buy {o} yet. Read this first.","Close-up, direct to camera",
 [["Real customers tried {o}. Here’s what they said.","Talking head, quote cards","Customer clips","Their words","Add only documented testimonials"],["Show the before and after, no filters.","Static camera, same framing","Before/after frames","No filters"]],
 [["The one detail about {o} nobody mentions.","Zoom slowly, whisper","Hands covering the label","Nobody mentions this"],["I almost skipped {o}. Then {b}.","Casual, walking shot","Unboxing","Almost skipped it"]]];
 const mk=i=>{const d=IND[i],f=s=>s.replace(/\{o\}/g,d.o).replace(/\{x\}/g,d.x).replace(/\{b\}/g,d.b);return H.map((a,t)=>a.map(h=>({t,hook:f(h[0]),cam:h[1],br:h[2],ov:h[3],rv:h[4]||""})))};
+
 /* theme */
 const root=document.documentElement;try{const s=localStorage.getItem("hm");if(s)root.dataset.theme=s}catch(e){}
 $("#th").onclick=()=>{const dk=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;root.dataset.theme=dk?"light":"dark";try{localStorage.setItem("hm",root.dataset.theme)}catch(e){}};
+
 /* hero typing */
 const ex=mk("E-com");let hi=0;async function hero(){const f=ex[hi%5][0];hi++;$("#dt").textContent=T[f.t][0];$("#dt").style.background=T[f.t][1];$("#dc").textContent="Camera: "+f.cam;$("#dov").textContent="Overlay: "+f.ov;const el=$("#dh");el.textContent="";
 if(RM){el.textContent=f.hook}else for(const c of f.hook){el.textContent+=c;await new Promise(r=>setTimeout(r,28))}setTimeout(hero,2600)}hero();
+
 /* tiles */
 const wk=["Our serum is the best.","Skin problems are hard.","Others work. Ours works better.","We’re trusted by many.","We have a great formula."];
 $("#tl").innerHTML=T.map((t,i)=>`<div class="card tile"><span class="tag" style="background:${t[1]}">${t[0]}</span><div class="x"><s>${wk[i]}</s><br><b>${ex[i][0].hook}</b></div></div>`).join("");
+
 /* slider */
 $("#rg").oninput=e=>{$("#cb").style.clipPath=`inset(0 0 0 ${e.target.value}%)`};
+
 /* in-view */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;if(e.target.id==="ch")e.target.classList.add("in");if(e.target.id==="pp"){[...e.target.querySelectorAll(".n")].forEach((n,i)=>setTimeout(()=>n.classList.add("on"),RM?0:i*450))}io.unobserve(e.target)}),{threshold:.4});io.observe($("#ch"));io.observe($("#pp"));
-/* dashboard */
-let cur=null,flt=-1,onlyOk=false,hist=[];const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-function render(){if(!cur)return;const rows=cur.data.map(a=>a.filter(h=>!onlyOk||!h.rv));
-$("#out").innerHTML=`<div class="bar"><button class="chip ${flt<0?"on":""}" data-f="-1">All</button>${T.map((t,i)=>`<button class="chip ${flt===i?"on":""}" data-f="${i}">${t[0]}</button>`).join("")}<label style="font-size:13px;margin-left:auto"><input type="checkbox" id="ok" ${onlyOk?"checked":""}> Clear only</label><button class="chip" id="ca">Copy all</button></div>
-<div class="cols">${rows.map((a,i)=>flt>=0&&flt!==i?"":`<div><span class="tag" style="background:${T[i][1]}">${T[i][0]}</span>${a.map((h,j)=>`<div class="hc" style="animation-delay:${(i*2+j)*70}ms"><p>${esc(h.hook)}</p><small>Camera: ${h.cam}</small><small>B-roll: ${h.br}</small><small>Overlay: ${h.ov}</small><div class="rk ${h.rv?"r":"c"}">${h.rv?"Review: "+h.rv:"Clear"}</div><div class="a"><button data-c="${esc(h.hook)}">Copy</button><button data-s>Star</button></div></div>`).join("")}</div>`).join("")}</div>`}
-$("#out").onclick=e=>{const b=e.target;if(b.dataset.f!==undefined){flt=+b.dataset.f;render()}else if(b.dataset.c)cp(b.dataset.c,b);else if(b.dataset.s!==undefined)b.textContent=b.textContent==="Star"?"Starred":"Star";else if(b.id==="ca")cp(cur.data.flat().map(h=>h.hook).join("\n"),b)};
+
+/* dashboard state & functions */
+let cur=null,flt=-1,onlyOk=false,hist=[];
+const esc=s=>String(s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+function render(){
+  if(!cur)return;
+  const rows=cur.data.map(a=>a.filter(h=>!onlyOk||!h.rv));
+  $("#out").innerHTML=`<div class="bar"><button class="chip ${flt<0?"on":""}" data-f="-1">All</button>${T.map((t,i)=>`<button class="chip ${flt===i?"on":""}" data-f="${i}">${t[0]}</button>`).join("")}<label style="font-size:13px;margin-left:auto"><input type="checkbox" id="ok" ${onlyOk?"checked":""}> Clear only</label><button class="chip" id="ca">Copy all</button></div>
+  <div class="cols">${rows.map((a,i)=>flt>=0&&flt!==i?"":`<div><span class="tag" style="background:${T[i][1]}">${T[i][0]}</span>${a.map((h,j)=>`<div class="hc" style="animation-delay:${(i*2+j)*70}ms"><p>${esc(h.hook)}</p><small>Camera: ${esc(h.cam)}</small><small>B-roll: ${esc(h.br)}</small><small>Overlay: ${esc(h.ov)}</small><div class="rk ${h.rv?"r":"c"}">${h.rv?"Review: "+esc(h.rv):"Clear"}</div><div class="a"><button data-c="${esc(h.hook)}">Copy</button><button data-s>Star</button></div></div>`).join("")}</div>`).join("")}</div>`;
+}
+
+$("#out").onclick=e=>{
+  const b=e.target;
+  if(b.dataset.f!==undefined){flt=+b.dataset.f;render()}
+  else if(b.dataset.c)cp(b.dataset.c,b);
+  else if(b.dataset.s!==undefined)b.textContent=b.textContent==="Star"?"Starred":"Star";
+  else if(b.id==="ca")cp(cur.data.flat().map(h=>h.hook).join("\n"),b);
+};
+
 $("#out").onchange=e=>{if(e.target.id==="ok"){onlyOk=e.target.checked;render()}};
-async function cp(t,b){const o=b.textContent;try{await navigator.clipboard.writeText(t);b.textContent="Copied"}catch(e){b.textContent="Select and copy manually"}setTimeout(()=>b.textContent=o,1400)}
-$("#go").onclick=()=>{const v=$("#in").value.trim();if(!v){$("#er").textContent="Add a URL or paste a script first.";$("#in").focus();return}$("#er").textContent="";
-const S=["Decompose offer","Five angles","Director + risk flag"];let i=0;const step=()=>{$("#out").innerHTML=`<div class="steps">${S.map((s,k)=>`<span class="${k<i?"dn":k===i?"on":""}">${k+1}. ${s}${k<i?" ✓":""}</span>`).join("")}</div>`;
-if(i++<S.length)setTimeout(step,RM?60:750);else{cur={ind:$("#ind").value,v,data:mk($("#ind").value)};flt=-1;hist.unshift(cur);hist=hist.slice(0,5);render();hl()}};step()};
+
+async function cp(t,b){const o=b.textContent;try{await navigator.clipboard.writeText(t);b.textContent="Copied"}catch(e){b.textContent="Select manually"}setTimeout(()=>b.textContent=o,1400)}
+
 function hl(){$("#hist").innerHTML=hist.map((h,i)=>`<button data-h="${i}" style="padding:4px 0;font-size:13px;color:var(--fg)">${h.ind}: ${esc(h.v.slice(0,18))}</button>`).join("")}
+
 $("#hist").onclick=e=>{if(e.target.dataset.h!==undefined){cur=hist[e.target.dataset.h];flt=-1;render()}};
-function csv(){if(!cur)return"";const q=s=>`"${s.replace(/"/g,'""')}"`;return["track,hook,camera,broll,overlay,risk"].concat(cur.data.flat().map(h=>[T[h.t][0],h.hook,h.cam,h.br,h.ov,h.rv?"Review":"Clear"].map(q).join(","))).join("\n")}
+
+function csv(){if(!cur)return"";const q=s=>`"${String(s||"").replace(/"/g,'""')}"`;return["track,hook,camera,broll,overlay,risk"].concat(cur.data.flat().map(h=>[T[h.t][0],h.hook,h.cam,h.br,h.ov,h.rv?"Review":"Clear"].map(q).join(","))).join("\n")}
+
 $("#rh").onclick=()=>{if(!cur){$("#er").textContent="Generate a matrix first, then export.";return}$("#ta").value=csv();$("#ov").classList.add("on")};
-$("#cl").onclick=()=>$("#ov").classList.remove("on");$("#cp").onclick=e=>cp($("#ta").value,e.target);
+$("#cl").onclick=()=>$("#ov").classList.remove("on");
+$("#cp").onclick=e=>cp($("#ta").value,e.target);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#ov").classList.remove("on")});
-</script><script>
-let live=null;
-(async()=>{try{if(window.claude)live=await claude.use("sample")}catch(e){}setMode()})();
-function setMode(){const m=$("#mode");m.textContent=live?"Live: generated by Claude":"Sample mode";m.style.background=live?"#1F7A4D":"#B26A00";m.style.color="#fff";
-$("#modeTxt").textContent=live?"Output is generated by Claude from the text you paste. Nothing is saved to a server; history lasts for this page session.":"This view can’t reach Claude, so output is canned sample content, not generated.";render()}
-$("#out").setAttribute("aria-live","polite");
-const TN=T.map(t=>t[0]);
-const em=e=>e&&e.code==="not_granted"?"Permission to ask Claude wasn’t granted. Allow it and try again.":e&&e.code==="rate_limited"?"Rate limited. Wait a moment and try again.":"The request failed or returned malformed output. Try again.";
-const J=async(p,o)=>{for(let k=0;;k++){try{return await live.json(p,Object.assign({cache:false},o))}catch(e){if(k||(e&&(e.code==="not_granted"||e.code==="rate_limited")))throw e}}};
-function stp(i){const S=["Decompose","Angles","Director"];$("#out").innerHTML=`<div class="steps">${S.map((s,k)=>`<span class="${k<i?"dn":k===i?"on":""}">${k+1}. ${s}${k<i?" ✓":k===i?" …":""}</span>`).join("")}</div>`}
-function render(){if(!cur)return;
-$("#out").innerHTML=`<div class="bar"><button class="chip ${flt<0?"on":""}" data-f="-1">All</button>${T.map((t,i)=>`<button class="chip ${flt===i?"on":""}" data-f="${i}">${t[0]}</button>`).join("")}<label style="font-size:13px;margin-left:auto"><input type="checkbox" id="ok" ${onlyOk?"checked":""}> Clear only</label><button class="chip" id="ca">Copy all</button></div>
-<p class="mut" style="font-size:12px;margin:0">${cur.sample?"Sample output, not generated. Per-hook controls need live mode.":"Generated by Claude. Review every hook before use; the risk flag is a heuristic aid."}</p>
-<div class="cols">${cur.data.map((a,i)=>flt>=0&&flt!==i?"":`<div><span class="tag" style="background:${T[i][1]}">${T[i][0]}</span>${a.map((h,j)=>({h,j})).filter(x=>!onlyOk||!x.h.rv).map(({h,j},n)=>`<div class="hc" style="animation-delay:${n*70}ms"><p>${esc(h.hook)}</p><small>Camera: ${esc(h.cam)}</small><small>B-roll: ${esc(h.br)}</small><small>Overlay: ${esc(h.ov)}</small><div class="rk ${h.rv?"r":"c"}">${h.rv?"Review: "+esc(h.rv):"Clear"}</div><div class="a" style="flex-wrap:wrap"><button data-c="${esc(h.hook)}">Copy</button><button data-s>Star</button>${["regen:Regenerate","short:Shorter","bold:Bolder","safe:Safer"].map(s=>{const[k,l]=s.split(":");return`<button data-m="${k}" data-i="${i}" data-j="${j}" ${cur.sample?"disabled title=\"Needs live mode\"":""}>${l}</button>`}).join("")}</div></div>`).join("")}</div>`).join("")}</div>`}
-async function tweak(b){const i=+b.dataset.i,j=+b.dataset.j,h=cur.data[i][j];
-const ins={regen:"Write a different hook for this track with a new opening idea.",short:"Make it shorter, ideally under 8 words.",bold:"Make it bolder and more direct without adding unsupported claims.",safe:"Make it safer: remove anything that needs substantiation or implies personal traits."}[b.dataset.m];
-const old=b.textContent;b.textContent="…";b.disabled=true;
-try{const r=await J(`Rewrite one ad hook. Track: ${TN[i]}. Instruction: ${ins} ${cur.rules}\nPRODUCT ANALYSIS: ${JSON.stringify(cur.ctx)}\nCURRENT: ${JSON.stringify(h)}\nReturn JSON {"hook":"","cam":"","br":"","ov":"max 6 words","rv":"short reason or empty"}. Use only facts in the analysis.`);
-if(!r||!r.hook)throw 0;Object.assign(h,{hook:String(r.hook),cam:String(r.cam||h.cam),br:String(r.br||h.br),ov:String(r.ov||h.ov).split(/\s+/).slice(0,6).join(" "),rv:String(r.rv||"")});render()}catch(e){b.textContent="Failed";setTimeout(()=>{b.textContent=old;b.disabled=false},1400)}}
-$("#out").onclick=e=>{const b=e.target;if(b.dataset.f!==undefined){flt=+b.dataset.f;render()}else if(b.dataset.c)cp(b.dataset.c,b);else if(b.dataset.s!==undefined)b.textContent=b.textContent==="Star"?"Starred":"Star";else if(b.id==="ca")cp(cur.data.flat().map(h=>h.hook).join("\n"),b);else if(b.dataset.m)tweak(b)};
-$("#go").onclick=async()=>{const v=$("#in").value.trim(),u=$("#url").value.trim(),ind=$("#ind").value,bv=$("#bv").value.trim(),nv=$("#nv").value.trim();
-if(v.length<20){$("#er").textContent=u?"URL retrieval isn’t connected yet. Paste the product description or script to generate.":"Paste a product description or ad script (a sentence or two at least).";$("#in").focus();return}
-$("#er").textContent="";
-if(!live){cur={ind,v,sample:1,data:mk(ind)};flt=-1;hist.unshift(cur);hist=hist.slice(0,5);render();hl();return}
-const b=$("#go");b.disabled=true;const rules=`Industry: ${ind}. Brand voice: ${bv||"none given"}. Never say: ${nv||"none given"}.`;
-try{stp(0);const a=await J(`You are a direct-response strategist. Using ONLY the source text, return JSON {"product":"","audience":"","benefit":"","problem":"","objections":[],"evidence":[],"claims":[],"assumptions":[]}. Put only facts found in the source in evidence and claims; anything you infer goes in assumptions. Never invent features, testimonials, certifications or numbers. ${rules}\nSOURCE:\n${v.slice(0,6000)}`);
-if(!a||typeof a!=="object"||!a.product)throw 0;
-stp(1);const h=await J(`Using ONLY this analysis, write 2 hooks for each of 5 tracks in this order: Contrarian, Problem-Agitate, Us-vs-Them, Proof-First, Open Loop. Hooks within and across tracks must use different opening ideas and tensions, not rewordings. Each must be speakable in about 3 seconds. No unsupported claims; Proof-First may use only the listed evidence. ${rules} Return JSON: [{"track":"Contrarian","hooks":["",""]}] with 5 items.\nANALYSIS: ${JSON.stringify(a)}`);
-if(!Array.isArray(h)||h.length!==5||h.some(x=>!x||!Array.isArray(x.hooks)||x.hooks.length<2))throw 0;
-const flat=[];h.forEach((x,t)=>x.hooks.slice(0,2).forEach(s=>flat.push({t,hook:String(s)})));
-stp(2);const d=await J(`For each numbered hook add production direction. Return a JSON array of 10 objects in order: {"cam":"camera framing","br":"B-roll cue","ov":"overlay text, max 6 words","rv":""}. Set rv to a short reason ONLY if the hook makes a claim needing substantiation (results, health, income), implies knowledge of the viewer’s personal traits, or breaks the never-say list; otherwise empty. This is a heuristic review aid.\nHOOKS: ${JSON.stringify(flat.map((f,k)=>[k,TN[f.t],f.hook]))}`);
-if(!Array.isArray(d)||d.length!==10)throw 0;
-const data=[[],[],[],[],[]];flat.forEach((f,k)=>{const x=d[k]||{};data[f.t].push({t:f.t,hook:f.hook,cam:String(x.cam||""),br:String(x.br||""),ov:String(x.ov||"").split(/\s+/).slice(0,6).join(" "),rv:String(x.rv||"")})});
-cur={ind,v,rules,ctx:a,data};flt=-1;hist.unshift(cur);hist=hist.slice(0,5);render();hl()}catch(e){$("#out").innerHTML=`<div class="empty" role="alert">${em(e)}</div>`}b.disabled=false};
-$("#rh").onclick=async()=>{if(!cur){$("#er").textContent="Generate a matrix first, then export.";return}const text=csv();
-try{const d=window.claude&&await claude.use("downloads");if(d){await d.save({filename:"hookmatrix.csv",data:text});return}}catch(e){if(e&&e.code==="declined")return}
-$("#ta").value=text;$("#ov").classList.add("on")};
-function tdr(r,n){const o=(r.observed||[]).filter(z=>T[z.track]),u=(r.untouched||[]).filter(z=>T[z.track]);
-$("#co").innerHTML=`<p class="mut" style="font-size:12px">${r.sample?"Sample analysis, not from your text.":"Generated by Claude from the "+n+" characters you pasted."}</p><div class="two" style="margin-top:8px"><div><h3>Observed in the text</h3>${o.map(z=>`<div class="hc"><span class="tag" style="background:${T[z.track][1]}">${T[z.track][0]}</span><p>“${esc(String(z.evidence))}”</p></div>`).join("")||"<p class=mut>No clear track found.</p>"}</div><div><h3>Hypotheses to test</h3>${u.map(z=>`<div class="hc"><span class="tag" style="background:${T[z.track][1]}">${T[z.track][0]}</span><small>${esc(String(z.why||""))}</small><p>${esc(String(z.hook||""))}</p></div>`).join("")||"<p class=mut>None found.</p>"}</div></div><p class="mut" style="font-size:12px;margin-top:10px">Observations come only from the pasted text. Hypotheses are untested and not a market-wide finding.</p>`}
-$("#ct").onclick=async()=>{const x=$("#cx").value.trim(),y=$("#cy").value.trim();if(x.length<40){$("#ce").textContent="Paste a few sentences of competitor copy first.";return}$("#ce").textContent="";
-if(!live){tdr({sample:1,observed:[{track:1,evidence:"Tired of wasting ad spend?"},{track:0,evidence:"Stop guessing what works"}],untouched:[{track:3,why:"No proof-led angle in this sample.",hook:"Here’s the unedited before and after."},{track:4,why:"No open-loop angle in this sample.",hook:"The one setting most buyers miss."}]},x.length);return}
-const b=$("#ct");b.disabled=true;$("#co").innerHTML=`<div class="empty" role="status">Analyzing…</div>`;
-try{const r=await J(`Analyze ONLY the competitor copy below for which of these five messaging tracks it uses: Contrarian(0), Problem-Agitate(1), Us-vs-Them(2), Proof-First(3), Open Loop(4). Return JSON {"observed":[{"track":0,"evidence":"short exact phrase from the text, under 12 words"}],"untouched":[{"track":0,"why":"","hook":"example hook for ${y||"the advertiser’s offer"}"}]}. untouched lists tracks with no clear evidence in this text. Make no claims about the wider market and do not reuse the competitor’s wording.\nTEXT:\n${x.slice(0,6000)}`);
-if(!r||!Array.isArray(r.observed)||!Array.isArray(r.untouched))throw 0;tdr(r,x.length)}catch(e){$("#co").innerHTML=`<div class="empty" role="alert">${em(e)}</div>`}b.disabled=false};
-</script><script>
+
+/* Live Generator trigger connected to Netlify Function */
+function stp(i) {
+  const S = ["Reading URL via Jina", "Generating Angles", "Finalizing Hooks"];
+  $("#out").innerHTML = `<div class="steps">${S.map((s, k) => `<span class="${k < i ? "dn" : k === i ? "on" : ""}">${k + 1}. ${s}${k < i ? " ✓" : k === i ? " …" : ""}</span>`).join("")}</div>`;
+}
+
+$("#go").onclick = async () => {
+  const v = $("#in").value.trim(),
+        u = $("#url").value.trim(),
+        ind = $("#ind").value,
+        bv = $("#bv").value.trim(),
+        nv = $("#nv").value.trim();
+
+  if (!v && !u) {
+    $("#er").textContent = "Please provide either a landing page URL or some copy/script.";
+    $("#in").focus();
+    return;
+  }
+  $("#er").textContent = "";
+
+  const b = $("#go");
+  b.disabled = true;
+
+  let currentStep = 0;
+  stp(0);
+  const stepTimer = setInterval(() => {
+    if (currentStep < 2) {
+      currentStep++;
+      stp(currentStep);
+    }
+  }, 1200);
+
+  try {
+    const res = await fetch("/.netlify/functions/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: u, rawText: v, industry: ind, brandVoice: bv, neverSay: nv })
+    });
+
+    clearInterval(stepTimer);
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.error || "Generation request failed");
+    }
+
+    const resJson = await res.json();
+    cur = {
+      ind: ind,
+      v: u || v,
+      sample: 0,
+      data: resJson.data
+    };
+
+    flt = -1;
+    hist.unshift(cur);
+    hist = hist.slice(0, 5);
+    render();
+    hl();
+  } catch (err) {
+    clearInterval(stepTimer);
+    $("#out").innerHTML = `<div class="empty" role="alert">${esc(err.message)}</div>`;
+  } finally {
+    b.disabled = false;
+  }
+};
+
+/* Tabs & UI setup */
 const M=$(".main"),gen=[...M.children];
 const mkv=(id,h)=>{const d=document.createElement("div");d.id=id;d.hidden=true;d.innerHTML=h;M.appendChild(d);return d};
-const SP=[["Glow serum spring launch","E-com","Today, 10:42"],["Pipeline reporting tool","SaaS","Yesterday"],["12-week reset program","Coaching","Mon"],["Family dental clinic","Local","Last week"]];
-const vh=mkv("v-h",`<h3>History</h3><p class="mut" style="font-size:13px;margin:4px 0 8px">Sample projects for illustration. Runs from this session appear in the left list.</p>${SP.map((p,i)=>`<div class="hc" style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div><b>${p[0]}</b><small>${p[1]} · ${p[2]} · 10 hooks</small></div><button class="chip" data-o="${i}">Open</button></div>`).join("")}`);
-const ve=mkv("v-e",`<h3>Exports</h3><p class="mut" style="font-size:13px;margin:4px 0 12px">Download the matrix currently on screen as CSV.</p><button class="btn" id="dl">Download current matrix (CSV)</button><div class="err" id="de" role="alert"></div><p class="mut" style="font-size:13px;margin-top:10px">Sample export log</p>${[["glow-serum-matrix.csv","Today"],["pipeline-tool-matrix.csv","Yesterday"]].map(x=>`<div class="hc"><b>${x[0]}</b><small>10 rows · ${x[1]} · sample entry</small></div>`).join("")}`);
-const vs=mkv("v-s",`<h3>Settings</h3><p class="mut" style="font-size:13px;margin:4px 0 10px">Applies to this page session only.</p><div class="form2"><select id="si" aria-label="Default industry"><option>E-com</option><option>SaaS</option><option>Coaching</option><option>Local</option></select><input id="sb" placeholder="Default brand voice" aria-label="Default brand voice"><label style="font-size:14px"><input type="checkbox" id="sr" checked> Show risk flags on cards</label><button class="btn g" id="st">Switch theme</button></div>`);
+const SP=[["Glow serum spring launch","E-com","Today"],["Pipeline reporting tool","SaaS","Yesterday"]];
+const vh=mkv("v-h",`<h3>History</h3><p class="mut" style="font-size:13px;margin:4px 0 8px">Past sessions and runs.</p>${SP.map((p,i)=>`<div class="hc" style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div><b>${p[0]}</b><small>${p[1]} · 10 hooks</small></div><button class="chip" data-o="${i}">Open</button></div>`).join("")}`);
+const ve=mkv("v-e",`<h3>Exports</h3><p class="mut" style="font-size:13px;margin:4px 0 12px">Download current matrix as CSV.</p><button class="btn" id="dl">Download current matrix (CSV)</button><div class="err" id="de" role="alert"></div>`);
+const vs=mkv("v-s",`<h3>Settings</h3><div class="form2"><select id="si"><option>E-com</option><option>SaaS</option><option>Coaching</option><option>Local</option></select><input id="sb" placeholder="Default brand voice"><button class="btn g" id="st">Switch theme</button></div>`);
+
 function tab(k){gen.forEach(e=>e.hidden=k!=="g");vh.hidden=k!=="h";ve.hidden=k!=="e";vs.hidden=k!=="s";document.querySelectorAll(".rail [data-t]").forEach(b=>b.classList.toggle("on",b.dataset.t===k))}
-$("#rh").onclick=null;$(".rail").addEventListener("click",e=>{const t=e.target.dataset.t;if(t)tab(t)});
+$(".rail").addEventListener("click",e=>{const t=e.target.dataset.t;if(t)tab(t)});
 vh.onclick=e=>{const i=e.target.dataset.o;if(i===undefined)return;const p=SP[i];cur={ind:p[1],v:p[0],sample:1,data:mk(p[1])};flt=-1;render();tab("g")};
-async function exportCsv(){const m=$("#de");m.textContent="";if(!cur){m.textContent="Generate or open a matrix first.";return}const text=csv();try{const d=window.claude&&await claude.use("downloads");if(d){await d.save({filename:"hookmatrix.csv",data:text});return}}catch(e){if(e&&e.code==="declined")return}$("#ta").value=text;$("#ov").classList.add("on")}
-$("#dl").onclick=exportCsv;
-$("#si").onchange=e=>{$("#ind").value=e.target.value};$("#sb").oninput=e=>{$("#bv").value=e.target.value};$("#sr").onchange=e=>document.body.classList.toggle("norisk",!e.target.checked);$("#st").onclick=()=>$("#th").click();
+$("#dl").onclick=()=>{if(!cur){$("#de").textContent="Generate a matrix first.";return}$("#ta").value=csv();$("#ov").classList.add("on")};
+$("#st").onclick=()=>$("#th").click();
+
+/* Initial state */
 cur={ind:"E-com",v:"",sample:1,data:mk("E-com")};render();
-/* mobile nav */
-const nv=$("nav .w"),mb=document.createElement("button");mb.className="btn g mb";mb.textContent="Menu";mb.setAttribute("aria-expanded","false");nv.insertBefore(mb,$("#th"));
-const mm=document.createElement("div");mm.className="mm";mm.hidden=true;mm.innerHTML=["how:How it works","tracks:Tracks","teardown:Teardown","demo:Dashboard","pricing:Pricing","faq:FAQ"].map(x=>{const[a,b]=x.split(":");return`<a href="#${a}">${b}</a>`}).join("");$("nav").appendChild(mm);
-mb.onclick=()=>{mm.hidden=!mm.hidden;mb.setAttribute("aria-expanded",String(!mm.hidden))};mm.onclick=e=>{if(e.target.tagName==="A"){mm.hidden=true;mb.setAttribute("aria-expanded","false")}};
-/* teardown visuals */
-const _t=window.tdr;window.tdr=function(r,n){_t(r,n);const c=Array(5).fill(0),p=Array(5).fill(0);(r.observed||[]).forEach(z=>{if(T[z.track])c[z.track]++});(r.untouched||[]).forEach(z=>{if(T[z.track])p[z.track]++});const mx=Math.max(1,...c,...p);
-const rows=T.map((t,i)=>`<div style="display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center;margin:6px 0;font-size:12px"><span>${t[0]}</span><div><div style="height:9px;border-radius:5px;background:#E8472B;width:${c[i]/mx*100}%;min-width:${c[i]?6:0}px"></div><div style="height:9px;margin-top:3px;border-radius:5px;background:#1F7A7A;width:${p[i]/mx*100}%;min-width:${p[i]?6:0}px"></div></div></div>`).join("");
-$("#co").insertAdjacentHTML("afterbegin",`<div class="card" style="margin:10px 0"><b style="font-size:13px">Angle coverage</b> <span class="mut" style="font-size:12px"><span style="color:#E8472B">■</span> competitor (observed) <span style="color:#1F7A7A">■</span> proposed to test</span>${rows}${c.some(v=>v>=2)?`<p class="mut" style="font-size:12px;margin:6px 0 0">Repeated pattern: ${T.filter((t,i)=>c[i]>=2).map(t=>t[0]).join(", ")} appears more than once in this text.</p>`:""}</div>`)};
-const cs=document.createElement("button");cs.className="btn g";cs.id="cs";cs.style.marginRight="8px";cs.textContent="Load sample competitor";$("#ct").before(cs);
-cs.onclick=()=>{const x="Brand X (fictional sample)\nTired of wasting ad spend? Brand X fixes your funnel.\nStop guessing. Tired of ads that flop?\nStruggling with low ROAS? We know the feeling.\nUnlike agencies, Brand X is simple.";$("#cx").value=x;$("#cy").value="Your offer";$("#ce").textContent="";
-tdr({sample:1,observed:[{track:1,evidence:"Tired of wasting ad spend?"},{track:1,evidence:"Tired of ads that flop?"},{track:1,evidence:"Struggling with low ROAS?"},{track:0,evidence:"Stop guessing."},{track:2,evidence:"Unlike agencies, Brand X is simple."}],untouched:[{track:3,why:"No proof-led angle in this sample.",hook:"Here’s the unedited before and after."},{track:4,why:"No open-loop angle in this sample.",hook:"The one setting most buyers miss."}]},x.length)};
-$("footer .w").insertAdjacentHTML("afterbegin",`<p style="margin:0 0 10px"><b style="color:var(--fg)">About the mark:</b> a hook drawn in matrix dots. The orange barb is the pattern break.</p>`);
 </script></body></html>
