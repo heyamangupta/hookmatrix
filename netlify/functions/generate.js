@@ -37,7 +37,7 @@ export default async (req) => {
       });
     }
 
-    // 2. Call Free Llama 3.3 on Groq
+    // 2. Call Free High-Speed Model on Groq
     const prompt = `You are an elite direct-response ad creative director.
 Read this product / landing page content:
 """
@@ -76,17 +76,17 @@ Return ONLY a valid JSON object matching this exact shape:
 }
 
 Track Reference:
-0: Contrarian (call out industry BS, pattern interrupt)
+0: Contrarian (call out industry assumptions, pattern interrupt)
 1: Problem-Agitate (uncomfortable reality, cost of inaction)
 2: Us vs Them (old way vs our way)
 3: Proof-First (hard numbers, real case studies, no hype)
 4: Open Loop (cliffhanger, curious detail)
 
 Fields:
-- "cam": camera framing (e.g. Tight selfie angle, Handheld macro).
+- "cam": camera framing (e.g., Tight selfie angle, Handheld macro).
 - "br": visual b-roll direction.
 - "ov": short overlay text (max 6 words).
-- "rv": leave empty "" unless it makes an aggressive medical/income claim that risks Meta/TikTok ad rejection.`;
+- "rv": leave empty "" unless it makes an aggressive medical/income claim that risks ad rejection.`;
 
     const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -95,7 +95,7 @@ Fields:
         "Authorization": `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "openai/gpt-oss-20b",
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: "You output strictly valid JSON matching the user schema. Do not write markdown blocks or introductory text." },
